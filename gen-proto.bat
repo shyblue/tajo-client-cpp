@@ -1,0 +1,1 @@
+f:\devel\proto\protoc -Isrc/main/proto/ --proto_path=../tajo-common/src/main/proto --proto_path=../tajo-catalog/tajo-catalog-common/src/main/proto --proto_path=../tajo-core/src/main/proto --cpp_out=src/generated-sources src/main/proto/ClientProtos.proto src/main/proto/TajoMasterClientProtocol.proto src/main/proto/QueryMasterClientProtocol.proto  src/main/proto/RpcProtos.proto 

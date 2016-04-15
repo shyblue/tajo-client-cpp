@@ -1,0 +1,12 @@
+Debug
+Release
+
+*.obj
+*.idb
+*.pdb
+*.sdf
+*.suo
+*.tlog
+*.log
+*.opensdf
+*.*~

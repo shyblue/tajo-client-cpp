@@ -1,0 +1,277 @@
+/**
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package tajo.client;
+
+option java_package = "org.apache.tajo.ipc";
+option java_outer_classname = "ClientProtos";
+option java_generic_services = true;
+option java_generate_equals_and_hash = true;
+
+import "tajo_protos.proto";
+import "TajoIdProtos.proto";
+import "CatalogProtos.proto";
+import "PrimitiveProtos.proto";
+import "DataTypes.proto";
+
+message CreateSessionRequest {
+  required string username = 1;
+  optional string baseDatabaseName = 2;
+}
+
+message CreateSessionResponse {
+  required ReturnState state = 1;
+  optional SessionIdProto sessionId = 2;
+  optional KeyValueSetProto sessionVars = 3;
+}
+
+message UpdateSessionVariableRequest {
+  optional SessionIdProto sessionId = 1;
+  optional KeyValueSetProto sessionVars = 2;
+  repeated string unsetVariables = 3;
+}
+
+message SessionUpdateResponse {
+  required ReturnState state = 1;
+  optional KeyValueSetProto sessionVars = 2;
+}
+
+message SessionedStringProto {
+  optional SessionIdProto sessionId = 1;
+  optional string value = 2;
+}
+
+message ExplainQueryResponse {
+  required ReturnState state = 1;
+  optional string explain = 2;
+}
+
+message QueryRequest {
+  optional SessionIdProto sessionId = 1;
+  required string query = 2;
+  repeated KeyValueProto sessionVars = 3;
+  required bool isJson = 4;
+}
+
+message UpdateQueryResponse {
+  required ReturnState state = 1;
+  optional KeyValueSetProto sessionVars = 2;
+}
+
+message GetQueryResultRequest {
+  optional SessionIdProto sessionId = 1;
+  required QueryIdProto queryId = 2;
+}
+
+message GetQueryResultResponse {
+  required ReturnState state = 1;
+  optional TableDescProto tableDesc = 2;
+  optional string tajoUserName = 3;
+}
+
+message QueryIdRequest {
+  optional SessionIdProto sessionId = 1;
+  required QueryIdProto queryId = 2;
+}
+
+message GetQueryListRequest {
+  optional SessionIdProto sessionId = 1;
+}
+
+message BriefQueryInfo {
+  required QueryIdProto queryId = 1;
+  required QueryState state = 2;
+  required int64 startTime = 3;
+  required int64 finishTime = 4;
+  required string query = 5;
+  optional string queryMasterHost = 6;
+  optional int32 queryMasterPort = 7;
+  required float progress = 8;
+}
+
+message GetQueryListResponse {
+  required ReturnState state = 1;
+  repeated BriefQueryInfo queryList = 2;
+}
+
+message GetQueryStatusRequest {
+  optional SessionIdProto sessionId = 1;
+  required QueryIdProto queryId = 2;
+}
+
+message SerializedResultSet {
+  required SchemaProto schema = 1;
+  required int32 rows = 2;
+  optional int32 decompressedLength = 3;
+  optional CodecType decompressCodec = 4;
+  optional bytes serializedTuples = 5;
+}
+
+message SubmitQueryResponse {
+  required ReturnState state = 1;
+
+  enum ResultType {
+    NO_RESULT = 0; // this query does not have any result.
+    ENCLOSED  = 1; // the response encloses the query result.
+    FETCH     = 2; // the query result should be fetched
+  }
+
+  optional ResultType result_type = 2;
+
+  optional QueryIdProto queryId = 3;
+  optional string userName = 4;
+
+  optional string queryMasterHost = 6;
+  optional int32 queryMasterPort = 7;
+
+  optional SerializedResultSet resultSet = 8;
+  optional TableDescProto tableDesc = 9;
+  optional int32 maxRowNum = 10;
+
+  optional KeyValueSetProto sessionVars = 11;
+}
+
+message GetQueryStatusResponse {
+  required ReturnState state = 1;
+  optional QueryIdProto queryId = 2;
+  optional QueryState query_state = 3;
+  optional float progress = 4;
+  optional int64 submitTime = 5;
+  optional int64 finishTime = 7;
+  optional bool hasResult = 8;
+  optional string errorMessage = 9;
+  optional string errorTrace = 10;
+  optional string queryMasterHost = 11;
+  optional int32 queryMasterPort = 12;
+}
+
+message GetQueryResultDataRequest {
+  required SessionIdProto sessionId = 1;
+  required QueryIdProto queryId = 2;
+  required int32 fetchRowNum = 3;
+  optional CodecType compressCodec = 4;
+}
+
+message GetQueryResultDataResponse {
+  required ReturnState state = 1;
+  optional SerializedResultSet resultSet = 2;
+}
+
+message GetClusterInfoRequest {
+  optional SessionIdProto sessionId = 1;
+}
+
+message WorkerResourceInfo {
+  required WorkerConnectionInfoProto connectionInfo = 1;
+  required NodeResourceProto totalResource = 2;
+  required NodeResourceProto availableResource = 3;
+  required int32 numRunningTasks = 4;
+  required string workerStatus = 5;
+  required int64 lastHeartbeat = 6;
+  required int32 numQueryMasterTasks = 7;
+}
+
+message GetClusterInfoResponse {
+  required ReturnState state = 1;
+  repeated WorkerResourceInfo workerList = 2;
+}
+
+message CreateTableRequest {
+  optional SessionIdProto sessionId = 1;
+  required string name = 2;
+  optional SchemaProto schema = 3;
+  required TableProto meta = 4;
+  required string path = 5;
+  optional PartitionMethodProto partition = 6;
+}
+
+message DropTableRequest {
+  optional SessionIdProto sessionId = 1;
+  required string name = 2;
+  optional bool purge = 3 [default = false];
+}
+
+message QueryInfoProto {
+  required string queryId = 1;
+  optional string sql = 2;
+  optional KeyValueSetProto contextVars= 3;
+  optional QueryState queryState = 4;
+  optional float progress = 5;
+  optional int64 startTime = 6;
+  optional int64 finishTime = 7;
+  optional string lastMessage = 8;
+  optional string hostNameOfQM = 9;
+  optional int32 queryMasterPort = 10;
+  optional int32 queryMasterClientPort = 11;
+  optional int32 queryMasterInfoPort = 12;
+  optional TableDescProto resultDesc = 13;
+}
+
+message StageHistoryProto {
+  required string executionBlockId =1;
+  required string state = 2;
+  optional int64 startTime = 3;
+  optional int64 finishTime = 4;
+  optional int32 succeededObjectCount = 5;
+  optional int32 failedObjectCount = 6;
+  optional int32 killedObjectCount = 7;
+  optional int32 totalScheduledObjectsCount = 8;
+
+  optional int64 totalInputBytes = 9;
+  optional int64 totalReadBytes = 10;
+  optional int64 totalReadRows = 11;
+  optional int64 totalWriteBytes = 12;
+  optional int64 totalWriteRows = 13;
+  optional int32 numShuffles = 14;
+  optional float progress =15;
+
+  optional string plan = 16;
+  optional int32 hostLocalAssigned = 17;
+  optional int32 rackLocalAssigned = 18;
+}
+
+message QueryHistoryProto {
+  required string queryId = 1;
+  optional string queryMaster = 2;
+  optional int32 httpPort = 3;
+  optional string logicalPlan = 4;
+  optional string distributedPlan = 5;
+  repeated KeyValueProto sessionVariables = 6;
+  repeated StageHistoryProto stageHistories = 7;
+}
+
+message GetQueryHistoryResponse {
+  required ReturnState state = 1;
+  optional QueryHistoryProto queryHistory = 2;
+}
+
+message GetQueryInfoResponse {
+  required ReturnState state = 1;
+  optional QueryInfoProto queryInfo = 2;
+}
+
+message CreateIndexResponse {
+  required ReturnState result = 1;
+  optional IndexDescProto indexDesc = 2;
+}
+
+message GetIndexWithColumnsRequest {
+  required SessionIdProto sessionId = 1;
+  required string tableName = 2;
+  repeated string columnNames = 3;
+}
