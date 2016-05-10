@@ -5,6 +5,8 @@
 
 #include "tajo_value.h"
 
+#include "RpcProtos.pb.h"
+#include <google/protobuf/io/zero_copy_stream_impl_lite.h>
 class TajoParser
 {
 public:

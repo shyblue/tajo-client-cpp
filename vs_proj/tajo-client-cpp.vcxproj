@@ -44,12 +44,15 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>F:\devel\boost;F:\devel\protobuf</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>_DEBUG;_WIN32_WINNT=0x501;_MBCS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>F:\devel\boost;F:\devel\proto\include;$(SolutionDir)\..\src\generated-sources</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>_SCL_SECURE_NO_WARNINGS;_DEBUG;_MBCS;_WIN32_WINNT=0x0501;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
+    <Lib>
+      <AdditionalLibraryDirectories>F:\devel\proto\lib</AdditionalLibraryDirectories>
+    </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
@@ -66,6 +69,17 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="..\src\generated-sources\CatalogProtos.pb.h" />
+    <ClInclude Include="..\src\generated-sources\ClientProtos.pb.h" />
+    <ClInclude Include="..\src\generated-sources\DataTypes.pb.h" />
+    <ClInclude Include="..\src\generated-sources\errors.pb.h" />
+    <ClInclude Include="..\src\generated-sources\PrimitiveProtos.pb.h" />
+    <ClInclude Include="..\src\generated-sources\QueryMasterClientProtocol.pb.h" />
+    <ClInclude Include="..\src\generated-sources\RpcProtos.pb.h" />
+    <ClInclude Include="..\src\generated-sources\stacktrace.pb.h" />
+    <ClInclude Include="..\src\generated-sources\TajoIdProtos.pb.h" />
+    <ClInclude Include="..\src\generated-sources\TajoMasterClientProtocol.pb.h" />
+    <ClInclude Include="..\src\generated-sources\tajo_protos.pb.h" />
     <ClInclude Include="..\src\main\tajo_async_client.h" />
     <ClInclude Include="..\src\main\tajo_buffer.h" />
     <ClInclude Include="..\src\main\tajo_client.h" />
@@ -79,6 +93,17 @@
     <ClInclude Include="..\src\main\tajo_version.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\src\generated-sources\CatalogProtos.pb.cc" />
+    <ClCompile Include="..\src\generated-sources\ClientProtos.pb.cc" />
+    <ClCompile Include="..\src\generated-sources\DataTypes.pb.cc" />
+    <ClCompile Include="..\src\generated-sources\errors.pb.cc" />
+    <ClCompile Include="..\src\generated-sources\PrimitiveProtos.pb.cc" />
+    <ClCompile Include="..\src\generated-sources\QueryMasterClientProtocol.pb.cc" />
+    <ClCompile Include="..\src\generated-sources\RpcProtos.pb.cc" />
+    <ClCompile Include="..\src\generated-sources\stacktrace.pb.cc" />
+    <ClCompile Include="..\src\generated-sources\TajoIdProtos.pb.cc" />
+    <ClCompile Include="..\src\generated-sources\TajoMasterClientProtocol.pb.cc" />
+    <ClCompile Include="..\src\generated-sources\tajo_protos.pb.cc" />
     <ClCompile Include="..\src\main\tajo_async_client.cpp" />
     <ClCompile Include="..\src\main\tajo_client_impl.cpp" />
     <ClCompile Include="..\src\main\tajo_parser.cpp" />

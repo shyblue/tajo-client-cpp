@@ -8,7 +8,7 @@
 #include "tajo_client_impl.h"
 
 TajoClientImpl::TajoClientImpl(boost::asio::io_service &ioService)
-    : state_(TajoClientState::NOTCONNECTED), strand_(ioService), socket_(ioService), subscribeSeq_(0)
+	: state_(TajoClientState::NOTCONNECTED), strand_(ioService), socket_(ioService), subscribeSeq_(0), sequence_(0)
 {
 }
 
@@ -154,26 +154,16 @@ void TajoClientImpl::handleAsyncConnect(const boost::system::error_code &ec,
     }
 }
 
-std::vector<char> TajoClientImpl::makeCommand(const std::vector<TajoBuffer> &items)
+std::vector<RpcRequest> TajoClientImpl::makeCommand(const std::vector<TajoBuffer> &items)
 {
-    static const char crlf[] = {'\r', '\n'};
+	std::vector<RpcRequest> result;
 
-    std::vector<char> result;
+	for (const auto& item : items)
+	{
+		RpcRequest req;
 
-    append(result, '*');
-    append(result, boost::lexical_cast<std::string>(items.size()));
-    append<>(result, crlf);
-
-    std::vector<TajoBuffer>::const_iterator it = items.begin(), end = items.end();
-    for(; it != end; ++it)
-    {
-        append(result, '$');
-        append(result, boost::lexical_cast<std::string>(it->size()));
-        append<>(result, crlf);
-        append(result, *it);
-        append<>(result, crlf);
-    }
-
+		result.push_back(req);
+	}
     return result;
 }
 
@@ -185,8 +175,9 @@ TajoValue TajoClientImpl::doSyncCommand(const std::vector<TajoBuffer> &buff)
 
 
     {
-        std::vector<char> data = makeCommand(buff);
-        boost::asio::write(socket_, boost::asio::buffer(data), boost::asio::transfer_all(), ec);
+        std::vector<RpcRequest> datas( std::move(makeCommand(buff)) );
+
+        boost::asio::write(socket_, boost::asio::buffer(datas), boost::asio::transfer_all(), ec);
     }
 
     if( ec )

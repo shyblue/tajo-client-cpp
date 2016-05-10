@@ -11,10 +11,14 @@
 #include <queue>
 #include <map>
 #include <array>
+#include <atomic>
 
 #include "tajo_status.h"
 #include "tajo_parser.h"
 #include "tajo_buffer.h"
+
+#include "RpcProtos.pb.h"
+#include <google/protobuf/io/zero_copy_stream_impl_lite.h>
 
 using namespace std::placeholders;
 
@@ -29,7 +33,7 @@ public:
 
      void close();
 
-     static std::vector<char> makeCommand(const std::vector<TajoBuffer> &items);
+     std::vector<RpcRequest> makeCommand(const std::vector<TajoBuffer> &items);
 
      TajoValue doSyncCommand(const std::vector<TajoBuffer> &buff);
 
@@ -63,6 +67,9 @@ public:
     TajoParser tajoParser_;
     std::array<char, 4096> buf_;
     size_t subscribeSeq_;
+	std::atomic<int32_t> sequence_;
+
+	inline int32_t GetSequence() { sequence_.fetch_add(1); return sequence_.load(); }
 
     typedef std::pair<size_t, std::function<void(const std::vector<char> &buf_)> > MsgHandlerType;
     typedef std::function<void(const std::vector<char> &buf_)> SingleShotHandlerType;

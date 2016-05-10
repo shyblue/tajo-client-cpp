@@ -16,6 +16,9 @@
     <Filter Include="Protobuf">
       <UniqueIdentifier>{c64910cd-88e8-433d-b436-74c63edf4356}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Generated Sources">
+      <UniqueIdentifier>{69e1c1c0-b96b-4291-8eeb-f52d14557908}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\main\tajo_async_client.h">
@@ -51,6 +54,39 @@
     <ClInclude Include="..\src\main\tajo_client_builder.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\src\generated-sources\RpcProtos.pb.h">
+      <Filter>Generated Sources</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\generated-sources\ClientProtos.pb.h">
+      <Filter>Generated Sources</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\generated-sources\DataTypes.pb.h">
+      <Filter>Generated Sources</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\generated-sources\QueryMasterClientProtocol.pb.h">
+      <Filter>Generated Sources</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\generated-sources\TajoMasterClientProtocol.pb.h">
+      <Filter>Generated Sources</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\generated-sources\tajo_protos.pb.h">
+      <Filter>Generated Sources</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\generated-sources\TajoIdProtos.pb.h">
+      <Filter>Generated Sources</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\generated-sources\CatalogProtos.pb.h">
+      <Filter>Generated Sources</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\generated-sources\PrimitiveProtos.pb.h">
+      <Filter>Generated Sources</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\generated-sources\errors.pb.h">
+      <Filter>Generated Sources</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\generated-sources\stacktrace.pb.h">
+      <Filter>Generated Sources</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\main\tajo_async_client.cpp">
@@ -67,6 +103,39 @@
     </ClCompile>
     <ClCompile Include="..\src\main\tajo_value.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\generated-sources\RpcProtos.pb.cc">
+      <Filter>Generated Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\generated-sources\ClientProtos.pb.cc">
+      <Filter>Generated Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\generated-sources\DataTypes.pb.cc">
+      <Filter>Generated Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\generated-sources\QueryMasterClientProtocol.pb.cc">
+      <Filter>Generated Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\generated-sources\TajoMasterClientProtocol.pb.cc">
+      <Filter>Generated Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\generated-sources\tajo_protos.pb.cc">
+      <Filter>Generated Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\generated-sources\TajoIdProtos.pb.cc">
+      <Filter>Generated Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\generated-sources\CatalogProtos.pb.cc">
+      <Filter>Generated Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\generated-sources\PrimitiveProtos.pb.cc">
+      <Filter>Generated Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\generated-sources\errors.pb.cc">
+      <Filter>Generated Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\generated-sources\stacktrace.pb.cc">
+      <Filter>Generated Sources</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
