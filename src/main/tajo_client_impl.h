@@ -12,6 +12,7 @@
 #include <map>
 #include <array>
 #include <atomic>
+#include <ostream>
 
 #include "tajo_status.h"
 #include "tajo_parser.h"
@@ -35,9 +36,13 @@ public:
 
      std::vector<RpcRequest> makeCommand(const std::vector<TajoBuffer> &items);
 
-     TajoValue doSyncCommand(const std::vector<TajoBuffer> &buff);
+	 std::pair<int, TajoValue> doSyncCommand(const std::string& method_name,const TajoBuffer& cmd);
+
+	 void TajoClientImpl::EncodeHeader(std::ostream& stream, int size);
+	 int TajoClientImpl::DecodeHeader(const char* buf);
 
      void doAsyncCommand(
+			const std::string method_name,
             const std::vector<char> &buff,
             const std::function<void(const TajoValue &)> &handler);
 
@@ -67,7 +72,7 @@ public:
     TajoParser tajoParser_;
     std::array<char, 4096> buf_;
     size_t subscribeSeq_;
-	std::atomic<int32_t> sequence_;
+	static std::atomic<int32_t> sequence_;
 
 	inline int32_t GetSequence() { sequence_.fetch_add(1); return sequence_.load(); }
 

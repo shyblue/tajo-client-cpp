@@ -1,5 +1,6 @@
 #pragma once
 
+
 #include <string>
 #include "tajo_client.h"
 
@@ -7,6 +8,8 @@ class TajoClientBuilder {
 	using client_t = TajoClient;
 	using self_t = TajoClientBuilder;
  public:
+	 TajoClientBuilder();
+	 ~TajoClientBuilder();
     // required
     self_t& master_server_addr(const std::string &addrs);
 
@@ -30,4 +33,8 @@ class TajoClientBuilder {
 
 private:
 	std::map<std::string, std::string> property_;
+	boost::asio::io_service io_service_;
+	client_t client_;
+
 };
+

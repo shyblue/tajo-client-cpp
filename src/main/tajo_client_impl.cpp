@@ -7,8 +7,9 @@
 
 #include "tajo_client_impl.h"
 
+const size_t HEADER_SIZE = 4;
 TajoClientImpl::TajoClientImpl(boost::asio::io_service &ioService)
-	: state_(TajoClientState::NOTCONNECTED), strand_(ioService), socket_(ioService), subscribeSeq_(0), sequence_(0)
+	: state_(TajoClientState::NOTCONNECTED), strand_(ioService), socket_(ioService), subscribeSeq_(0)
 {
 }
 
@@ -158,67 +159,90 @@ std::vector<RpcRequest> TajoClientImpl::makeCommand(const std::vector<TajoBuffer
 {
 	std::vector<RpcRequest> result;
 
+	int id = 0;
 	for (const auto& item : items)
 	{
 		RpcRequest req;
+
+		req.set_id(++id);
+		req.set_request_message(item.data());
+
 
 		result.push_back(req);
 	}
     return result;
 }
 
-TajoValue TajoClientImpl::doSyncCommand(const std::vector<TajoBuffer> &buff)
-{
-    assert( queue_.empty() );
+void TajoClientImpl::EncodeHeader(std::ostream& stream, int size) {
+	uint8_t buf[HEADER_SIZE];
+	buf[0] = static_cast<uint8_t>((size >> 24) & 0xFF);
+	buf[1] = static_cast<uint8_t>((size >> 16) & 0xFF);
+	buf[2] = static_cast<uint8_t>((size >> 8) & 0xFF);
+	buf[3] = static_cast<uint8_t>(size & 0xFF);
+	stream.write(reinterpret_cast<const char*>(buf), HEADER_SIZE);
+}
 
+int TajoClientImpl::DecodeHeader(const char* buf) {
+	int size = (buf[0] << 24) + (buf[1] << 16) + (buf[2] << 8) + buf[3];
+
+	return size;
+}
+
+std::pair<int,TajoValue> TajoClientImpl::doSyncCommand(const std::string& method_name, const TajoBuffer& cmd)
+{
     boost::system::error_code ec;
 
+	RpcRequest req;
+	req.set_id(GetSequence());
+	req.set_method_name(method_name);
+	req.set_request_message(cmd.data(),cmd.size());
 
-    {
-        std::vector<RpcRequest> datas( std::move(makeCommand(buff)) );
+	req.ByteSize();
 
-        boost::asio::write(socket_, boost::asio::buffer(datas), boost::asio::transfer_all(), ec);
-    }
+	boost::asio::streambuf buffer;
+	buffer.prepare(HEADER_SIZE + req.ByteSize());
+	std::ostream req_stream(&buffer);
+
+	EncodeHeader(req_stream, req.ByteSize());
+	req.SerializeToOstream(&req_stream);
+
+	boost::asio::write(socket_, boost::asio::buffer(boost::asio::buffer_cast<const char*>(buffer.data()), buffer.size()), boost::asio::transfer_all(), ec);
 
     if( ec )
     {
         errorHandler_(ec.message());
-        return TajoValue();
+        return std::make_pair(-1,TajoValue());
     }
     else
     {
-		boost::array<char, 4096> inbuff{ 0x00, };
+		boost::array<char, 4096> inbuff{};
 
+		size_t read_size = 0;
+		size_t body_size = 0;
         for(;;)
         {
-            size_t size = socket_.read_some(boost::asio::buffer(inbuff));
-
-            for(size_t pos = 0; pos < size;)
-            {
-                std::pair<size_t, TajoParser::ParseResult> result = 
-                    tajoParser_.parse(inbuff.data() + pos, size - pos);
-
-                if( result.second == TajoParser::Completed )
-                {
-                    return tajoParser_.result();
-                }
-                else if( result.second == TajoParser::Incompleted )
-                {
-                    pos += result.first;
-                    continue;
-                }
-                else
-                {
-                    errorHandler_("[tajoClient] Parser error");
-                    return TajoValue();
-                }
-            }
+            read_size += socket_.read_some(boost::asio::buffer(inbuff));
+			if (read_size < HEADER_SIZE) continue;
+			
+			if (body_size == 0) body_size = DecodeHeader(inbuff.data());
+			if( read_size < body_size + HEADER_SIZE) continue;
+			else break;
+			            
         }
+
+		RpcResponse res;
+		res.ParseFromArray(inbuff.data() + HEADER_SIZE, body_size);
+
+		TajoValue v(res.response_message());
+
+		return std::make_pair(res.id(), v);
+
     }
 }
 
-void TajoClientImpl::doAsyncCommand(const std::vector<char> &buff,
-                                     const std::function<void(const TajoValue &)> &handler)
+void TajoClientImpl::doAsyncCommand(const std::string method_name,
+	const std::vector<char> &buff,
+	const std::function<void(const TajoValue &)> &handler)
 {
     QueueItem item;
 

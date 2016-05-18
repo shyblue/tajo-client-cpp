@@ -137,6 +137,9 @@
     <ClCompile Include="..\src\generated-sources\stacktrace.pb.cc">
       <Filter>Generated Sources</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\main\tajo_client_builder.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\src\main\proto\ClientProtos.proto">
